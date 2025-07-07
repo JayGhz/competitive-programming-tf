@@ -1,0 +1,7 @@
+6
+add 1 pattern1_alice
+add 2 pattern2_bob
+add 3 pattern3_charlie
+append pattern
+append 2_bobabc
+backspace 3
