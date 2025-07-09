@@ -1,0 +1,108 @@
+Se trata de una programación dinámica con estados binarios y restricciones de transición
+estado = 0 → No contrataste al trabajador de la fila k
+estado = 1 → Sí contrataste al trabajador de la fila k
+
+1. nclusión de bibliotecas y configuración inicial:
+
+#include <bits/stdc++.h>
+using namespace std;
+#define int long long
+#define fast ios::sync_with_stdio(false); cin.tie(0); cout.tie(0);
+
+- Incluye todas las bibliotecas estándar de C++
+- Define int como long long para manejar números grandes
+- Optimiza la entrada/salida desactivando la sincronización con C
+
+2. Definición de constante:
+
+const long long INF = 4e18;
+
+- Define un valor "infinito" para usar en la programación dinámica
+
+- Lee el tamaño de la matriz n
+
+4. Lectura de la matriz de alturas:
+    vector<vector<long long>> h(n, vector<long long>(n));
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            cin >> h[i][j];
+        }}
+- Crea y lee una matriz h de nxn que representa alturas
+
+5. Lectura de vectores de costos:
+    vector<long long> a(n);
+    for (int i = 0; i < n; ++i) {
+        cin >> a[i];
+    }
+
+    vector<long long> b(n);
+    for (int i = 0; i < n; ++i) {
+        cin >> b[i];
+    }
+
+- Lee dos vectores a y b que representan costos
+
+6. Programación dinámica para el eje X:
+
+    vector<vector<long long>> dp_x(n, vector<long long>(2, INF));
+    dp_x[0][0] = 0;
+    dp_x[0][1] = a[0];
+
+- Inicializa la tabla de DP para el eje X
+- dp_x[i][j] representa el costo mínimo hasta la posición i con estado j (0 o 1)
+-- Crea una tabla DP de tamaño n×2
+- dp_x[i][0]: costo mínimo hasta la posición i sin aplicar operación
+- dp_x[i][1]: costo mínimo hasta la posición i aplicando operación (sumando a[i])
+- Inicializa todo con INF (infinito)
+- Caso base: posición 0 sin operación cuesta 0, con operación cuesta a[0]
+
+7. Cálculo de transiciones prohibidas en X:
+
+for (int j = 0; j < n; ++j) {
+    if (h[k-1][j] == h[k][j]) {
+        forbidden_x_transitions.insert({0, 0});
+        forbidden_x_transitions.insert({1, 1});
+    } else if (h[k-1][j] == h[k][j] + 1) {
+        forbidden_x_transitions.insert({0, 1});
+    } else if (h[k-1][j] == h[k][j] - 1) {
+        forbidden_x_transitions.insert({1, 0});
+    }
+}
+- Para cada posición k, calcula qué transiciones están prohibidas basadas en las diferencias de altura
+- Compara alturas entre filas consecutivas (k-1 y k)
+- Si son iguales: prohíbe mantener el mismo estado (0→0 y 1→1)
+- Si k-1 es mayor por 1: prohíbe transición 0→1
+- Si k-1 es menor por 1: prohíbe transición 1→0
+- Actualiza los valores de DP considerando las transiciones permitidas y los costos
+
+Tranciones: if (dp_x[k-1][1] != INF && forbidden_x_transitions.find({1, 0}) == forbidden_x_transitions.end()) {
+    dp_x[k][0] = min(dp_x[k][0], dp_x[k-1][1]);
+}
+
+- Si hay un camino válido hasta k-1 con estado 1 (dp_x[k-1][1] != INF)
+- Y la transición de 1→0 no está prohibida (forbidden_x_transitions.find({1, 0}) == forbidden_x_transitions.end())
+- Entonces podemos llegar a k con estado 0 desde k-1 con estado 1
+- El costo será el mínimo entre el costo actual y el costo del estado anterior
+
+8. Similar proceso para el eje Y:
+
+- Realiza el mismo proceso de DP pero para el eje Y usando el vector de costos b
+
+9. Resultado final:
+
+    if (min_cost_x == INF || min_cost_y == INF) {
+        cout << -1 << endl;
+    } else {
+        cout << min_cost_x + min_cost_y << endl;
+    }
+
+- Si no hay solución posible (costo infinito), imprime -1
+- Si hay solución, imprime la suma de los costos mínimos en X e Y
+
+
+Se trata de una programación dinámica con estados binarios y restricciones de transición
+Optimización con restricciones :
+
+- Usa un conjunto (set) para mantener transiciones prohibidas
+- Las transiciones dependen de las diferencias de altura
+- Solo permite transiciones válidas según las restricciones del problema
